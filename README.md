@@ -1,5 +1,4 @@
 # Simulator-Rental-Kendaraan-dengan-Performa-dan-Fault-Handling
-VEHICLE RENTAL MANAGEMENT SYSTEM (C++ OOP, EXCEPTIONS, RAII, RUNTIME POLYMORPHISM)
 =================================================================================
 
 Program ini merupakan sistem penyewaan kendaraan berbasis OOP dalam C++.
