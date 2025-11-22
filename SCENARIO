@@ -1,0 +1,91 @@
+=====================================================
+SCENARIO 1 — INISIALISASI FLEET
+=====================================================
+AddVehicle: Car, id=1, name="Avanza", rate=200, capacity=7
+AddVehicle: Truck, id=2, name="Hino Dutro", rate=400, maxLoadKg=1000
+AddVehicle: ElectricCar, id=3, name="Tesla Model 3", rate=350, battery=5/75
+
+EXPECTED:
+- Fleet tersimpan di RentalManager.
+- Tidak ada error.
+
+
+=====================================================
+SCENARIO 2 — RENT KENDARAAN NORMAL
+=====================================================
+RentVehicle: id=1, member="Aldi", days=3
+RentVehicle: id=2, member="Budi", days=2, loadKg=500
+
+EXPECTED:
+- Car disewa 3 hari biaya 3*200.
+- Truck disewa dengan load 500kg (valid).
+- Status aktif tersimpan dalam map activeRentals.
+
+
+=====================================================
+SCENARIO 3 — RENT TRUCK MELEBIHI MUATAN
+=====================================================
+RentVehicle: id=2, member="Caca", days=1, loadKg=1500
+
+EXPECTED:
+Exception: OverloadException
+"Requested load 1500 > maxLoad 1000"
+- Tidak masuk map activeRentals.
+- Logger mencatat error.
+
+
+=====================================================
+SCENARIO 4 — RENT ELECTRIC CAR BATERAI RENDAH
+=====================================================
+RentVehicle: id=3, member="Dito", days=2
+
+EXPECTED:
+Exception: BatteryLowException
+"Battery too low to start vehicle id=3"
+- Tidak disewa sampai di-charge.
+
+
+=====================================================
+SCENARIO 5 — CHARGE DAN RENT ELECTRIC CAR
+=====================================================
+ChargeVehicle: id=3, amount=30
+RentVehicle: id=3, member="Dito", days=2
+
+EXPECTED:
+- Battery naik dari 5 → 35 kWh
+- Sewa berhasil setelah charge
+- Logger menulis "EV charged" dan "rent success"
+
+
+=====================================================
+SCENARIO 6 — RETURN NORMAL TANPA KERUSAKAN
+=====================================================
+ReturnVehicle: id=1, actualDays=3, damaged=false
+
+EXPECTED:
+- Tidak ada penalty.
+- Entry di activeRentals dihapus.
+- Logger: "Returned OK"
+
+
+=====================================================
+SCENARIO 7 — RETURN TRUCK TERLAMBAT + DAMAGE
+=====================================================
+ReturnVehicle: id=2, actualDays=4, damaged=true
+
+EXPECTED:
+- Denda keterlambatan sesuai actualDays.
+- Jika id genap dan damaged, raise exception.
+- Logger mencatat error dan biaya tambahan.
+
+
+=====================================================
+SCENARIO 8 — MULTI RENT DAN STATUS FLEET
+=====================================================
+PrintFleetStatus()
+
+EXPECTED:
+Menampilkan:
+[1] Car (FREE)
+[2] Truck (FREE atau DAMAGED BLOCKED)
+[3] ElectricCar (RENTED / FREE tergantung skenario sebelumnya)
